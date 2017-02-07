@@ -21,9 +21,36 @@ class Deck
     post_sz = 4
     posts  = make_posts(deck, post_sz)
 
-    floor = make_floor3(deck, @width + @cornerspace, @length)
+    floor = make_floor4(deck, @width + @cornerspace, @length)
     move(floor, 0, 0, @height)
     return deck
+  end
+
+  def make_floor4(deck, width, length)
+    # horizontal strips with horiz box
+    floor = deck.entities.add_group
+    floor.name = "floor"
+    floor.material = @material
+
+    border1 = make_cube(floor, @lumber_w, @length,@lumber_t)
+    border2 = copy_obj(border1)
+    move(border2, width - @lumber_w, 0, 0)
+    stripes = make_vert_stripes(floor, length, width-2*@lumber_w)
+    #move(stripes, 0, @lumber_w, 0)
+    rotate_z(stripes, 0, 0, 0, 90)
+    move(stripes, 0, -width+self.lumber_w, 0)
+
+    # make box wall
+    box_wall = make_vert_stripes(floor, @length, @box_height)
+    rotate_y(box_wall, 0, 0, 0, -90)
+    rotate_z(box_wall, 0, 0, 0, -90)
+    move(box_wall, -@length, 0, -@width-self.lumber_t)
+
+    # make box top
+    box_top = make_vert_stripes(floor, length, @cornerspace)
+    rotate_z(box_top, 0, 0, 0, 90)
+    move(box_top, 0, -@width-@cornerspace, @box_height)
+    return floor
   end
 
   def make_floor3(deck, width, length)

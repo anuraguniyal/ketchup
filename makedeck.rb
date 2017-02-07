@@ -21,12 +21,55 @@ class Deck
     post_sz = 4
     posts  = make_posts(deck, post_sz)
 
-    floor = make_floor(deck, @width + @cornerspace, @length)
+    floor = make_floor2(deck, @width + @cornerspace, @length)
     move(floor, 0, 0, @height)
     return deck
   end
 
-  def make_floor(deck, width, length)
+  def make_floor2(deck, width, length)
+    # simple vertical strips with border in middle too
+    floor = deck.entities.add_group
+    floor.name = "floor"
+    floor.material = @material
+
+    border1 = make_cube(floor, width, @lumber_w, @lumber_t)
+    border2 = copy_obj(border1)
+    border3 = copy_obj(border1)
+    move(border2, 0, length - @lumber_w, 0)
+    move(border3, 0, length/2, 0)
+    stripes1 = make_vert_stripes(floor, width, (length/2)-2*@lumber_w)
+    move(stripes1, 0, @lumber_w+length/2, 0)
+    stripes2 = make_vert_stripes(floor, width, (length/2)-@lumber_w)
+    move(stripes2, 0, @lumber_w, 0)
+
+    # make box wall
+    box_wall_border1 = make_cube(floor, @lumber_t, @lumber_w, @box_height)
+    move(box_wall_border1, @width, 0 , 0)
+    box_wall_border2 = copy_obj(box_wall_border1)
+    move(box_wall_border2, 0, length - @lumber_w, 0)
+    box_wall_border3 = copy_obj(box_wall_border1)
+    move(box_wall_border3, -1, length/2, self.lumber_t)
+
+    box_wall = make_vert_stripes(floor, @box_height, length-2*@lumber_w)
+    move(box_wall, @width+@lumber_t, @lumber_w, 0)
+    rotate_y(box_wall, 0, 0, 0, -90)
+
+    # make box top
+    box_top_border1 = make_cube(floor, @cornerspace, @lumber_w, @lumber_t)
+    move(box_top_border1, @width, 0, @box_height)
+    box_top_border2 = copy_obj(box_top_border1)
+    move(box_top_border2, 0, length - @lumber_w, 0)
+    box_top_border3 = copy_obj(box_top_border1)
+    move(box_top_border3, 0, length/2, 0)
+
+    box_top1 = make_vert_stripes(floor, @cornerspace, (length/2)-2*@lumber_w)
+    move(box_top1, @width, @lumber_w+length/2, @box_height)
+    box_top2 = make_vert_stripes(floor, @cornerspace, (length/2)-@lumber_w)
+    move(box_top2, @width, @lumber_w, @box_height)
+    return floor
+  end
+  def make_floor1(deck, width, length)
+    # simple vertical strips with borders
     floor = deck.entities.add_group
     floor.name = "floor"
     floor.material = @material

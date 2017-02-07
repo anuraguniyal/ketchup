@@ -21,9 +21,44 @@ class Deck
     post_sz = 4
     posts  = make_posts(deck, post_sz)
 
-    floor = make_floor2(deck, @width + @cornerspace, @length)
+    floor = make_floor3(deck, @width + @cornerspace, @length)
     move(floor, 0, 0, @height)
     return deck
+  end
+
+  def make_floor3(deck, width, length)
+    # horizontal strips with vertical box
+    floor = deck.entities.add_group
+    floor.name = "floor"
+    floor.material = @material
+
+    border1 = make_cube(floor, @lumber_w, @length,@lumber_t)
+    border2 = copy_obj(border1)
+    move(border2, width - @lumber_w, 0, 0)
+    stripes = make_vert_stripes(floor, length, width-2*@lumber_w)
+    #move(stripes, 0, @lumber_w, 0)
+    rotate_z(stripes, 0, 0, 0, 90)
+    move(stripes, 0, -width+self.lumber_w, 0)
+
+    # make box wall
+    box_wall_border1 = make_cube(floor, @lumber_t, @lumber_w, @box_height)
+    move(box_wall_border1, @width, 0 , 0)
+    box_wall_border2 = copy_obj(box_wall_border1)
+    move(box_wall_border2, 0, length - @lumber_w, 0)
+
+    box_wall = make_vert_stripes(floor, @box_height, length-2*@lumber_w)
+    move(box_wall, @width+@lumber_t, @lumber_w, 0)
+    rotate_y(box_wall, 0, 0, 0, -90)
+
+    # make box top
+    box_top_border1 = make_cube(floor, @cornerspace, @lumber_w, @lumber_t)
+    move(box_top_border1, @width, 0, @box_height)
+    box_top_border2 = copy_obj(box_top_border1)
+    move(box_top_border2, 0, length - @lumber_w, 0)
+
+    box_top = make_vert_stripes(floor, @cornerspace, length-2*@lumber_w)
+    move(box_top, @width, @lumber_w, @box_height)
+    return floor
   end
 
   def make_floor2(deck, width, length)
@@ -110,15 +145,15 @@ class Deck
     n.times do |i|
       x = i*@lumber_w
       w = @lumber_w
+      if remain <= 0
+        break
+      end
       remain -= w
       if remain < 0
         w = remain + @lumber_w
       end
       slat = make_cube(stripes, w, length, @lumber_t)
       move(slat, x, 0, 0)
-      if remain < 0
-        break
-      end
     end
     return stripes
   end

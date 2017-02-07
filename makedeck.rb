@@ -2,16 +2,14 @@ require 'sketchup.rb'
 require 'utils.rb'
 
 class Deck
-  attr_accessor :lumber_w, :lumber_t
-  attr_reader :width, :height, :length, :box_height
   def initialize(width, length, height, cornerspace, box_height)
     @width = width
     @length = length
     @height = height
     @box_height = box_height
     @cornerspace = cornerspace
-    self.lumber_t = 1.5
-    self.lumber_w = 5.5
+    @lumber_t = 1.5
+    @lumber_w = 5.5
     @material = "#6e2701"
   end
 
@@ -33,30 +31,30 @@ class Deck
     floor.name = "floor"
     floor.material = @material
 
-    border1 = make_cube(floor, width, self.lumber_w, self.lumber_t)
+    border1 = make_cube(floor, width, @lumber_w, @lumber_t)
     border2 = copy_obj(border1)
-    move(border2, 0, length - self.lumber_w, 0)
-    stripes = make_vert_stripes(floor, width, length-2*self.lumber_w)
-    move(stripes, 0, self.lumber_w, 0)
+    move(border2, 0, length - @lumber_w, 0)
+    stripes = make_vert_stripes(floor, width, length-2*@lumber_w)
+    move(stripes, 0, @lumber_w, 0)
 
     # make box wall
-    box_wall_border1 = make_cube(floor, self.lumber_t, self.lumber_w, self.box_height)
-    move(box_wall_border1, self.width, 0 , 0)
+    box_wall_border1 = make_cube(floor, @lumber_t, @lumber_w, @box_height)
+    move(box_wall_border1, @width, 0 , 0)
     box_wall_border2 = copy_obj(box_wall_border1)
-    move(box_wall_border2, 0, length - self.lumber_w, 0)
+    move(box_wall_border2, 0, length - @lumber_w, 0)
 
-    box_wall = make_vert_stripes(floor, self.box_height, length-2*self.lumber_w)
-    move(box_wall, self.width+self.lumber_t, self.lumber_w, 0)
+    box_wall = make_vert_stripes(floor, @box_height, length-2*@lumber_w)
+    move(box_wall, @width+@lumber_t, @lumber_w, 0)
     rotate_y(box_wall, 0, 0, 0, -90)
 
     # make box top
-    box_top_border1 = make_cube(floor, @cornerspace, self.lumber_w, self.lumber_t)
-    move(box_top_border1, self.width, 0, self.box_height)
+    box_top_border1 = make_cube(floor, @cornerspace, @lumber_w, @lumber_t)
+    move(box_top_border1, @width, 0, @box_height)
     box_top_border2 = copy_obj(box_top_border1)
-    move(box_top_border2, 0, length - self.lumber_w, 0)
+    move(box_top_border2, 0, length - @lumber_w, 0)
 
-    box_top = make_vert_stripes(floor, @cornerspace, length-2*self.lumber_w)
-    move(box_top, @width, self.lumber_w, self.box_height)
+    box_top = make_vert_stripes(floor, @cornerspace, length-2*@lumber_w)
+    move(box_top, @width, @lumber_w, @box_height)
     return floor
   end
 
@@ -64,16 +62,16 @@ class Deck
     # add stripes
     stripes = floor.entities.add_group
     stripes.name = "stripes"
-    n = (width/self.lumber_w).to_i + 1
+    n = (width/@lumber_w).to_i + 1
     remain = width
     n.times do |i|
-      x = i*self.lumber_w
-      w = self.lumber_w
+      x = i*@lumber_w
+      w = @lumber_w
       remain -= w
       if remain < 0
-        w = remain + self.lumber_w
+        w = remain + @lumber_w
       end
-      slat = make_cube(stripes, w, length, self.lumber_t)
+      slat = make_cube(stripes, w, length, @lumber_t)
       move(slat, x, 0, 0)
       if remain < 0
         break

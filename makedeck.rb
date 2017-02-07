@@ -2,7 +2,7 @@ require 'sketchup.rb'
 require 'utils.rb'
 
 class Deck
-  def initialize(width, length, height, cornerspace, box_height)
+  def initialize(style, width, length, height, cornerspace, box_height)
     @width = width
     @length = length
     @height = height
@@ -11,6 +11,13 @@ class Deck
     @lumber_t = 1.5
     @lumber_w = 5.5
     @material = "#6e2701"
+    @material = "#612711" #redwood
+    @material = Sketchup.active_model.materials.add "Redwood"
+    cur_folder = File.expand_path(File.dirname(__FILE__))
+    tex_file = "#{cur_folder}/texture/redwood2.jpg"
+    @material.texture = tex_file
+    @material.texture.size = 5.5
+    @style = style
   end
 
 
@@ -21,7 +28,8 @@ class Deck
     post_sz = 4
     posts  = make_posts(deck, post_sz)
 
-    floor = make_floor4(deck, @width + @cornerspace, @length)
+    method_name = "make_floor#{@style}"
+    floor = method(method_name).call(deck, @width + @cornerspace, @length)
     move(floor, 0, 0, @height)
     return deck
   end
@@ -44,7 +52,7 @@ class Deck
     box_wall = make_vert_stripes(floor, @length, @box_height)
     rotate_y(box_wall, 0, 0, 0, -90)
     rotate_z(box_wall, 0, 0, 0, -90)
-    move(box_wall, -@length, 0, -@width-self.lumber_t)
+    move(box_wall, -@length, 0, 0.1-@width-self.lumber_t)
 
     # make box top
     box_top = make_vert_stripes(floor, length, @cornerspace)
@@ -74,7 +82,7 @@ class Deck
     move(box_wall_border2, 0, length - @lumber_w, 0)
 
     box_wall = make_vert_stripes(floor, @box_height, length-2*@lumber_w)
-    move(box_wall, @width+@lumber_t, @lumber_w, 0)
+    move(box_wall, @width+@lumber_t-0.1, @lumber_w, 0)
     rotate_y(box_wall, 0, 0, 0, -90)
 
     # make box top
@@ -113,7 +121,7 @@ class Deck
     move(box_wall_border3, -1, length/2, self.lumber_t)
 
     box_wall = make_vert_stripes(floor, @box_height, length-2*@lumber_w)
-    move(box_wall, @width+@lumber_t, @lumber_w, 0)
+    move(box_wall, @width+@lumber_t-0.1, @lumber_w, 0)
     rotate_y(box_wall, 0, 0, 0, -90)
 
     # make box top
@@ -130,6 +138,7 @@ class Deck
     move(box_top2, @width, @lumber_w, @box_height)
     return floor
   end
+
   def make_floor1(deck, width, length)
     # simple vertical strips with borders
     floor = deck.entities.add_group
@@ -149,7 +158,7 @@ class Deck
     move(box_wall_border2, 0, length - @lumber_w, 0)
 
     box_wall = make_vert_stripes(floor, @box_height, length-2*@lumber_w)
-    move(box_wall, @width+@lumber_t, @lumber_w, 0)
+    move(box_wall, @width+@lumber_t-0.1, @lumber_w, 0)
     rotate_y(box_wall, 0, 0, 0, -90)
 
     # make box top
@@ -206,4 +215,11 @@ end
 
 
 erase
-deck = Deck.new(10*12, 11*12, 7.5, 3*12, 19).make()
+4.times do |i|
+  deck = Deck.new(i+1, 10*12, 11*12, 7.5, 3*12, 19).make()
+  r = i/2
+  c = i%2
+  x = r*300
+  y = c*300
+  move(deck, x, y, 0)
+end
